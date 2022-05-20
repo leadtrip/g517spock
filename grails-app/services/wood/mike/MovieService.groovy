@@ -22,4 +22,14 @@ class MovieService {
     def movieSearch( String movieTitle ) {
         Movie.findAllByTitleIlike( '%' + movieTitle + '%' )
     }
+
+    def createMovie(params) {
+        new Movie( title: params.title, releaseDate: params.releaseDate ).save(failOnError: true)
+    }
+
+    def updateMovie(params) {
+        def movie = Movie.get(params.id)
+        movie.title = params.title
+        movie.save(failOnError: true)
+    }
 }

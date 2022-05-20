@@ -23,4 +23,12 @@ class MovieController {
         }
         render (view: 'search')
     }
+
+    def create() {
+        movieService.createMovie(params)
+    }
+
+    def update() {
+        movieService.updateMovie(params)
+    }
 }

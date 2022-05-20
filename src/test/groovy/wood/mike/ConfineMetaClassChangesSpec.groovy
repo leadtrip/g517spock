@@ -156,4 +156,110 @@ class ConfineMetaClassChangesSpec extends Specification implements ControllerUni
         then:
            model.movies[0].title == movieTitle
     }
+
+    /**
+     * A static closure on the instance does not get invoked when calling the non-static method
+     */
+    def "test static metaclass change to instance" () {
+        given:
+            def movieTitle = 'finding nemo'
+            def silentHill = new Movie(title: movieTitle, releaseDate: LocalDate.of( 2003, Month.OCTOBER, 10 )).save()
+            params.movieTitle = movieTitle
+        and:
+            def newMovieTitle = 'monsters inc'
+            silentHill.metaClass.static.getTitle = { -> newMovieTitle }
+        when:
+            controller.movieSearch()
+        then:
+           model.movies[0].title == movieTitle      // same movie/title set at start
+    }
+
+    def "test domain save standard" () {
+        given:
+            params.title = 'Lucky'
+            params.releaseDate = LocalDate.now()
+        when:
+            controller.create()
+        then:
+            Movie.findByTitle( params.title )
+    }
+
+    @ConfineMetaClassChanges(Movie)
+    def "test domain save change domain metaclass save" () {
+        given:
+            params.title = 'Lucky'
+            params.releaseDate = LocalDate.now()
+        and:
+            def saved = false
+            Movie.metaClass.static.save = { Map args -> saved = true }      // this only works if static
+        when:
+            controller.create()
+        then:
+            saved
+            !Movie.findByTitle( params.title )
+    }
+
+    /**
+     * This would typically fail without ConfineMetaClassChanges on previous method
+     */
+    def "test domain save standard again 2" () {
+        given:
+            params.title = 'Cheese'
+            params.releaseDate = LocalDate.now()
+        when:
+            controller.create()
+        then:
+            Movie.findByTitle( params.title )
+    }
+
+    def "test update standard" () {
+        given:
+            def americanPie = new Movie(title: 'american pie', releaseDate: LocalDate.of( 1999, Month.OCTOBER, 8 )).save()
+            def newTitle = 'aliens'
+        and:
+            params.id = americanPie.id
+            params.title = newTitle
+        when:
+            controller.update()
+        then:
+            Movie.get(americanPie.id).title == newTitle
+    }
+
+    def "test update change metaclass on instance" () {
+        given:
+            def tron = new Movie(title: 'tron', releaseDate: LocalDate.of( 1982, Month.OCTOBER, 21 )).save()
+            def newTitle = 'jaws'
+        and:
+            params.id = tron.id
+            params.title = newTitle
+        and:
+            def saved = false
+            tron.metaClass.static.save = { Map args -> saved = true }       // seem to have to use static for save, even on instance
+        and:
+            assert Movie.get(tron.id).title == 'tron'
+        when:
+            controller.update()
+        then:
+            saved
+            Movie.get(tron.id).title == newTitle        // the title is updated, which is odd?
+    }
+
+    def "test update change metaclass on instance with exception" () {
+        given:
+            def shrek = new Movie(title: 'shrek', releaseDate: LocalDate.of(2001, Month.JUNE, 29)).save()
+            def newTitle = 'get out'
+        and:
+            params.id = shrek.id
+            params.title = newTitle
+        and:
+            shrek.metaClass.static.save = { Map args -> throw new UnsupportedOperationException('no saving allowed') }
+        and:
+            assert Movie.get(shrek.id).title == 'shrek'
+        when:
+           controller.update()
+        then:
+            thrown(UnsupportedOperationException)
+        and:
+            !Movie.all      // unsure as to why there are no movies after this
+    }
 }
