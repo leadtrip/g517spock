@@ -14,4 +14,13 @@ class MovieController {
         }
         render( view: 'search' )
     }
+
+    def movieSearch() {
+        if ( params.movieTitle ) {
+            def movies = movieService.movieSearch( params.movieTitle )
+            render( view: movies, model: [movies: movies] )
+            return
+        }
+        render (view: 'search')
+    }
 }

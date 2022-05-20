@@ -18,4 +18,8 @@ class MovieService {
     def getActorAsString( Actor actor ) {
         actor.forename + ' ' + actor.surname + ' [' + actor.dob + ']'
     }
+
+    def movieSearch( String movieTitle ) {
+        Movie.findAllByTitleIlike( '%' + movieTitle + '%' )
+    }
 }
