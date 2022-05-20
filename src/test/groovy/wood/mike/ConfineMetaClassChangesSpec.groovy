@@ -8,6 +8,10 @@ import spock.util.mop.ConfineMetaClassChanges
 import java.time.LocalDate
 import java.time.Month
 
+/**
+ * Testing various combinations of modifying the metaclass and the side effects using @ConfineMetaClassChanges
+ * Try removing the @ConfineMetaClassChanges annotation from the methods below to see different outcomes
+ */
 class ConfineMetaClassChangesSpec extends Specification implements ControllerUnitTest<MovieController>, DataTest{
 
     def movieService = Spy(MovieService)
@@ -85,7 +89,7 @@ class ConfineMetaClassChangesSpec extends Specification implements ControllerUni
            model.movies[0].title == thePoltergeist.title
     }
 
-    def "test standard again again"() {
+    def "test standard again 2"() {
         given:
             def movieTitle = 'rain man'
             new Movie(title: movieTitle, releaseDate: LocalDate.of( 1989, Month.MARCH, 3 )).save()
@@ -94,5 +98,62 @@ class ConfineMetaClassChangesSpec extends Specification implements ControllerUni
             controller.movieSearch()
         then:
             model.movies[0].title == movieTitle
+    }
+
+    /**
+     * This requires @ConfineMetaClassChanges because we're modifying the class
+     */
+    @ConfineMetaClassChanges(Movie)
+    def "test non static metaclass change to class" () {
+        given:
+            def movieTitle = 'sunshine'
+            new Movie(title: movieTitle, releaseDate: LocalDate.of( 2007, Month.APRIL, 5 )).save()
+            params.movieTitle = movieTitle
+        and:
+            def newMovieTitle = 'mary poppins'
+            Movie.metaClass.getTitle = { -> newMovieTitle }
+        when:
+            controller.movieSearch()
+        then:
+            model.movies[0].title == newMovieTitle
+    }
+
+    def "test standard again 3"() {
+        given:
+            def movieTitle = 'point break'
+            new Movie(title: movieTitle, releaseDate: LocalDate.of( 1991, Month.JULY, 12 )).save()
+            params.movieTitle = movieTitle
+        when:
+            controller.movieSearch()
+        then:
+            model.movies[0].title == movieTitle
+    }
+
+    /**
+     * This does not need @ConfineMetaClassChanges because we're modifying an instance
+     */
+    def "test non static metaclass change to instance" () {
+        given:
+            def movieTitle = 'silent hill'
+            def silentHill = new Movie(title: movieTitle, releaseDate: LocalDate.of( 2006, Month.APRIL, 21 )).save()
+            params.movieTitle = movieTitle
+        and:
+            def newMovieTitle = 'gladiator'
+            silentHill.metaClass.getTitle = { -> newMovieTitle }
+        when:
+            controller.movieSearch()
+        then:
+            model.movies[0].title == newMovieTitle
+    }
+
+    def "test standard again 4"() {
+        given:
+            def movieTitle = 'the matrix'
+            new Movie(title: movieTitle, releaseDate: LocalDate.of( 1999, Month.JUNE, 11 )).save()
+            params.movieTitle = movieTitle
+        when:
+            controller.movieSearch()
+        then:
+           model.movies[0].title == movieTitle
     }
 }
