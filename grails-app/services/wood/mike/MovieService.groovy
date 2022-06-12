@@ -6,7 +6,7 @@ import grails.gorm.transactions.Transactional
 class MovieService {
 
     def findAllMoviesForActor( Actor actor ) {
-        Movie.findAllByActors( actor )
+        Movie.findAllByActors( [actor] as Set )
     }
 
     def findActorsForMovie( Movie movie ) {
