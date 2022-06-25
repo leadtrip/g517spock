@@ -7,7 +7,6 @@ class Movie {
     String title
     LocalDate releaseDate
 
-    static belongsTo = Actor
     static hasMany = [actors: Actor]
 
     static constraints = {

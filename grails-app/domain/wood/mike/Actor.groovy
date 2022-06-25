@@ -8,6 +8,7 @@ class Actor {
     String surname
     LocalDate dob
 
+    static belongsTo = Movie
     static hasMany = [movies: Movie]
 
     static constraints = {
