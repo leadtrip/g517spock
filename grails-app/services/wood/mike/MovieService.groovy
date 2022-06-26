@@ -5,6 +5,14 @@ import grails.gorm.transactions.Transactional
 @Transactional
 class MovieService {
 
+    def allMovies() {
+        Movie.all
+    }
+
+    def get(id) {
+        Movie.get(id)
+    }
+
     def findAllMoviesForActor( Actor actor ) {
         Movie.findAllByActors( actor )
     }

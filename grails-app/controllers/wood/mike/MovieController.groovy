@@ -4,7 +4,13 @@ class MovieController {
 
     def movieService
 
-    def index() { }
+    def index() {
+        [allMovies: movieService.allMovies()]
+    }
+
+    def show() {
+        respond movieService.get(params.id)
+    }
 
     def search() {
         if ( params.actor ) {
