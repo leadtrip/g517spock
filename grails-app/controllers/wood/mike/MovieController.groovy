@@ -5,7 +5,7 @@ class MovieController {
     def movieService
 
     def index() {
-        [allMovies: movieService.allMovies()]
+        [movieList: movieService.allMovies()]
     }
 
     def show() {

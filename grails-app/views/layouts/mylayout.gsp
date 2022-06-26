@@ -7,6 +7,8 @@
 
     <asset:stylesheet src="application.css"/>
 
+    <title><g:layoutTitle default="Movies and Actors"/></title>
+
     <g:layoutHead/>
 </head>
 

@@ -9,6 +9,10 @@ class ActorService {
         Actor.get( id )
     }
 
+    def all() {
+        Actor.all
+    }
+
     def moviesForActor( Serializable id ) {
         Actor.get( id ).movies
     }
