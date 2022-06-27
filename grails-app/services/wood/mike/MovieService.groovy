@@ -40,4 +40,16 @@ class MovieService {
         movie.title = params.title
         movie.save(failOnError: true)
     }
+
+    def getMovieWithNewSession(id) {
+        Movie.withNewSession {
+            Movie.get(id)
+        }
+    }
+
+    def getMovieWithNewTransaction( id ) {
+        Movie.withNewTransaction {
+            Movie.get(id)
+        }
+    }
 }
