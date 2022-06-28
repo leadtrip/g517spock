@@ -52,4 +52,16 @@ class MovieService {
             Movie.get(id)
         }
     }
+
+    def createMovieWithNewSession(movieAttrs) {
+        Movie.withNewSession {
+            new Movie(movieAttrs).save()
+        }
+    }
+
+    def createMovieWithNewTransaction(movieAttrs) {
+        Movie.withNewSession {
+            new Movie(movieAttrs).save()
+        }
+    }
 }
