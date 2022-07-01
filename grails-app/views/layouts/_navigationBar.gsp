@@ -12,6 +12,7 @@
                 </a>
                 <div class="dropdown-menu" aria-labelledby="movieDropdown">
                     <g:link controller="movie" class="dropdown-item">All</g:link>
+                    <g:link controller="movie" action="random" class="dropdown-item">Random</g:link>
                 </div>
             </li>
             <li class="nav-item dropdown">

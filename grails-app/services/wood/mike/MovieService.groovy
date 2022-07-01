@@ -60,8 +60,22 @@ class MovieService {
     }
 
     def createMovieWithNewTransaction(movieAttrs) {
-        Movie.withNewSession {
+        Movie.withNewTransaction {
             new Movie(movieAttrs).save()
+        }
+    }
+
+    def updateThenFlushInWithNewSession(id) {
+        Movie.withNewSession { session ->
+            def movie = Movie.get(id)
+            movie.title = 'The end'
+            movie.save()
+
+            try {
+                // this just doesn't work, we get 'javax.persistence.TransactionRequiredException: no transaction is in progress'
+                session.flush()
+            } catch(ignore) {}
+            movie
         }
     }
 }

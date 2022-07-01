@@ -1,6 +1,7 @@
 package wood.mike.integration
 
 import grails.gorm.transactions.Rollback
+import grails.gorm.transactions.Transactional
 import grails.testing.mixin.integration.Integration
 import spock.lang.Specification
 import wood.mike.Movie
@@ -120,5 +121,29 @@ class MovieServiceIntegrationSpec extends Specification{
             savedMovie.releaseDate == releaseDate
         and:
             Movie.findByTitle(title)
+    }
+
+    /**
+     * The method we're calling uses withNewSession to find the data added by the test, for this to work we need to add
+     * it in the test using withNewSession, neither withNewTransaction or annotating method with @Transactional work, the
+     * service does not find the added data.
+     */
+    void "test updateThenFlushInWithNewSession"() {
+        given:
+            def movie = createMovie()
+        when:
+            def updated = movieService.updateThenFlushInWithNewSession(movie.id)
+        then:
+            updated.title == 'The end'
+    }
+
+    /**
+     * Add a movie in a new session
+     * Note you can't add flush: true as this will fail, not that you need to as the service finds the data without this
+     */
+    def createMovie() {
+        Movie.withNewSession {
+            new Movie(title: 'Chicken run', releaseDate: LocalDate.of(2000, Month.JUNE, 30)).save()
+        }
     }
 }

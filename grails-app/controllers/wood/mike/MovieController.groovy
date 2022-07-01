@@ -37,4 +37,13 @@ class MovieController {
     def update() {
         movieService.updateMovie(params)
     }
+
+    def random() {
+
+    }
+
+    def updateThenFlushInWithNewSession() {
+        def movie = Movie.findByTitle('Raw deal')
+        render (view: 'random', model: [result: movieService.updateThenFlushInWithNewSession(movie.id)] )
+    }
 }
